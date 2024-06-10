@@ -18,6 +18,7 @@ async function handleRegistration(req, res) {
     //check user exists
     const existsUser = await User.findOne({ email: email });
     if (existsUser) {
+        console.log('User already exits.');
         return res.json({ error: "User already exists" });
     }
 
@@ -60,7 +61,6 @@ async function createRegisterChallenge(req, res) {
     if (!challengePayload) {
         return res.json({ error: 'Unable to generate challenge' });
     }
-    console.log('SignUP challenge: ', challengePayload.challenge);
 
     // store the user challenge in DB
     const response = await Challenges.create({
@@ -145,14 +145,12 @@ async function createLoginChallenge(req, res) {
 }
 
 async function verifyLoginChallenge(req, res) {
-    console.log('Entered verify login challenge');
-    // cred returned by startAuthentication() from frontend
+    console.log('=== Login Verification Started ===')
+
+    // Take user data
     const { email, cred } = req.body;
-    console.log('Email:', email);
-    console.log("Cred:", cred);
 
     const { challenge } = await Challenges.findOne({ email: email });
-    console.log('Challenge:', challenge);
     if (!challenge) {
         return res.json({ error: 'Challenge not found for the user' });
     };
@@ -162,45 +160,41 @@ async function verifyLoginChallenge(req, res) {
     if (!user || !user.passKey) {
         return res.json({ error: 'User or passKey not found' });
     }
-    console.log('Retrieved User PassKey: ', user.passKey);
 
-    console.log('Public ID')
+    // stringify passKey as it returns an object
     const userPassKeyString = JSON.stringify(user.passKey.credentialPublicKey);
-    console.log('User passkey-string: ', userPassKeyString);
-    console.log('Public ID')
-    
-    // Convert Base64 string to Uint8Array
-    console.log('uint8')
+
+    // Convert Base64 string to Uint8Array , the authenticator takes credentialPublicKey as uint8array
     const userPassKeyUint8Array = Buffer.from(userPassKeyString, 'base64');
-    console.log('userpasskey Uint8Array: ', userPassKeyUint8Array);
-    console.log('uint8')
-    
-    
-    console.log('credentialID: ', user.passKey.credentialID);
-    console.log('credentialPublicKey: ', user.passKey.credentialPublicKey);
-    console.log('counter: ', user.passKey.counter);
-    
+
     // authenticator metadata
-    const authenticatorMetaData = {
+    const authenticator = {
         credentialID: user.passKey.credentialID,
-        credentialPublicKey:  userPassKeyUint8Array,
+        credentialPublicKey: userPassKeyUint8Array,
         counter: user.passKey.counter,
     }
 
+    // Verify Authentication Response
     try {
-        console.log('==== Verification Result Started =====')
         const verificationResult = await verifyAuthenticationResponse({
             expectedChallenge: challenge,
             expectedOrigin: 'http://localhost:5173',
             expectedRPID: 'localhost',
             response: cred,
-            authenticator: authenticatorMetaData,
+            authenticator: authenticator,
         })
-        console.log('VerificationResult ended');
-        console.log('Verification Result:', verificationResult);
+
+        console.log('=== VerificationResult ended ===');
+        console.log("Verification Status: ", verificationResult.verified);
+        
         // --------------
         // PENDING: JWT token,sessions
         //---------------
+        
+        if (!verificationResult.verified) {
+            console.log('Verification Result Status :', verificationResult.verified);
+            return res.json({ success: false, message: "User verification Failed" });
+        }
 
         console.log('Login verification done !!');
         return res.json({
@@ -211,9 +205,7 @@ async function verifyLoginChallenge(req, res) {
     } catch (error) {
         console.error('Error during verification:', error);
         return res.json({ error: 'User not verified' });
-
     }
-
 };
 
 export {
