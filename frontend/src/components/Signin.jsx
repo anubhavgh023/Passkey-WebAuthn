@@ -51,7 +51,14 @@ function Signin() {
         id="main-container"
         className="border border-slate-600 h-2/3 bg-neutral-950 rounded-md flex flex-col justify-center"
       >
-        <div className="flex flex-col items-center ">
+        <div className="flex flex-col items-center p-5">
+          <div className="flex gap-1 justify-center items-center">
+            <h1 className="text-4xl">
+              <span className="text-orange-600">मेघ </span>
+              <span className="text-blue-500">बुद्धिमान</span>
+            </h1>
+            <img src="./cloud.svg" alt="" />
+          </div>
           <h1 className="text-slate-100 font-bold text-3xl mt-3 p-1">SignIn</h1>
           <span className="text-slate-200 w-2/3 text-center">
             Enter your information to create an account
