@@ -14,9 +14,9 @@ function Dashboard() {
             loop={true}
           >
             <span className="inline-block">Dashboard</span>
-            <Typist.Delay ms={1000} />
+            <Typist.Delay ms={10000} />
             <Typist.Backspace count={9} />
-            <Typist.Delay ms={500} />
+            <Typist.Delay ms={100} />
           </Typist>
         </div>
       </div>

@@ -1,14 +1,6 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-    firstName: {
-        type: String,
-        required: true,
-    },
-    lastName: {
-        type: String,
-        required: true,
-    },
     email: {
         type: String,
         required: true,
@@ -19,7 +11,7 @@ const userSchema = new mongoose.Schema({
         required: true
     },
     passKey: {
-        type:mongoose.Schema.Types.Mixed,
+        type: mongoose.Schema.Types.Mixed,
         default: null,
     }
 })

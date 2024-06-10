@@ -1,39 +1,23 @@
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useState } from "react";
-import {startRegistration,startAuthentication} from "@simplewebauthn/browser"
+import {
+  startRegistration,
+  startAuthentication,
+} from "@simplewebauthn/browser";
 
 const url = "http://localhost:3000/api/user";
 
 function Signup() {
-  //formData
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const navigate = useNavigate();
-  // //navigate to dashborad-page
-  // navigate("/dashboard");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { firstName, lastName, email, password } = formData;
-
     try {
       await axios.post(`${url}/register`, {
-        firstName,
-        lastName,
         email,
         password,
       });
@@ -41,7 +25,7 @@ function Signup() {
       // create challenge
       const challenge = await axios.post(`${url}/register-challenge`, {
         email,
-      })
+      });
 
       const { options } = challenge.data;
 
@@ -51,15 +35,13 @@ function Signup() {
       //verify user
       const verify = await axios.post(`${url}/register-verify`, {
         email,
-        cred: authResult
-      })
-
-
+        cred: authResult,
+      });
 
       if (verify) {
         navigate("/dashboard");
       }
-      
+
       console.log("Signup successful");
     } catch (error) {
       console.error("Input field invalid", error);
@@ -84,37 +66,22 @@ function Signup() {
           </span>
         </div>
         <form onSubmit={handleSubmit} className="flex flex-col p-5 gap-7">
-          <div className="flex gap-2">
-            <InputField
-              label="First Name"
-              placeholder="John"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleChange}
-            />
-            <InputField
-              label="Last Name"
-              placeholder="Doe"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleChange}
-            />
-          </div>
+          <div className="flex gap-2"></div>
           <InputField
             label="Email"
             placeholder="johndoe@email.com"
             type="email"
             name="email"
-            value={formData.email}
-            onChange={handleChange}
+            value={email}
+            onChange={e => setEmail(e.target.value)}
           />
           <InputField
             label="Password"
             placeholder="password"
             type="password"
             name="password"
-            value={formData.password}
-            onChange={handleChange}
+            value={password}
+            onChange={e => setPassword(e.target.value)}
           />
           <button className="bg-green-600 text-white font-medium rounded-lg w-full h-12 hover:bg-opacity-75 active:scale-95 active:bg-opacity-90">
             Sign Up
