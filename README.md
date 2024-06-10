@@ -22,5 +22,7 @@
     - go to backend folder: cd backend/
     - run: npm run dev
 
+    - Open MongoDb compass & click connect
+    - connect to this default url: mongodb://localhost:27017/passkey-auth
 
 ### Site is running on: http://localhost:3000
