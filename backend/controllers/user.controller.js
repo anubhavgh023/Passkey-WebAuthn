@@ -5,7 +5,7 @@ import {
     generateRegistrationOptions,
     verifyRegistrationResponse,
     generateAuthenticationOptions,
-    verifyAuthenticationResponse,
+    verifyAuthenticationResponse
 } from "@simplewebauthn/server"
 
 
@@ -164,6 +164,29 @@ async function verifyLoginChallenge(req, res) {
     }
     console.log('Retrieved User PassKey: ', user.passKey);
 
+    console.log('Public ID')
+    const userPassKeyString = JSON.stringify(user.passKey.credentialPublicKey);
+    console.log('User passkey-string: ', userPassKeyString);
+    console.log('Public ID')
+    
+    // Convert Base64 string to Uint8Array
+    console.log('uint8')
+    const userPassKeyUint8Array = Buffer.from(userPassKeyString, 'base64');
+    console.log('userpasskey Uint8Array: ', userPassKeyUint8Array);
+    console.log('uint8')
+    
+    
+    console.log('credentialID: ', user.passKey.credentialID);
+    console.log('credentialPublicKey: ', user.passKey.credentialPublicKey);
+    console.log('counter: ', user.passKey.counter);
+    
+    // authenticator metadata
+    const authenticatorMetaData = {
+        credentialID: user.passKey.credentialID,
+        credentialPublicKey:  userPassKeyUint8Array,
+        counter: user.passKey.counter,
+    }
+
     try {
         console.log('==== Verification Result Started =====')
         const verificationResult = await verifyAuthenticationResponse({
@@ -171,7 +194,7 @@ async function verifyLoginChallenge(req, res) {
             expectedOrigin: 'http://localhost:5173',
             expectedRPID: 'localhost',
             response: cred,
-            authenticator: user.passKey, 
+            authenticator: authenticatorMetaData,
         })
         console.log('VerificationResult ended');
         console.log('Verification Result:', verificationResult);

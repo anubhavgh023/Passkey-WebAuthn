@@ -29,14 +29,16 @@ function Signin() {
         email,
         cred: authResult,
       });
+      console.log("Verify Response", verify);
 
-      if (verify.success) {
-        navigate("/dashboard");
+      if (!verify.data.success) {
+        return console.log("SignIn Error");
       }
 
-      console.log("SignIn successful", response);
+      navigate("/dashboard");
+      console.log("SignIn successful");
     } catch (error) {
-      console.error("ERR:", error.message);
+      return console.error("ERR:", error.message);
     }
   };
 
